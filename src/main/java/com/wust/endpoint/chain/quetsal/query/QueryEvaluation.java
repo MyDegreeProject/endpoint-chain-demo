@@ -1,9 +1,7 @@
 package com.wust.endpoint.chain.quetsal.query;
 
 import com.fluidops.fedx.Config;
-import com.fluidops.fedx.DefaultEndpointListProvider;
 import com.fluidops.fedx.FedXFactory;
-import com.fluidops.fedx.sail.FedXSailRepository;
 import com.fluidops.fedx.structures.QueryInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -11,7 +9,6 @@ import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
 
 import java.io.ByteArrayOutputStream;
@@ -124,14 +121,50 @@ public class QueryEvaluation {
     public static void main(String[] args) throws Exception {
 
         String cfgName = args[0];
+        String repfile = args.length > 1 ? args[1] : null;
+
         String host = "localhost";
         List<String> endpointsMin = Arrays.asList(
-                //"http://" + host + ":8890/sparql",
+                "http://" + host + ":8891/sparql",
                 "http://" + host + ":8892/sparql",
                 "http://" + host + ":8895/sparql"
         );
-        String queries = "C1";
-        multyEvaluate(queries,1,cfgName,endpointsMin);
+        String queries = "CD1";
+        Map<String, List<List<Object>>> reports = multyEvaluate(queries,1,cfgName,endpointsMin);
+        for (Map.Entry<String, List<List<Object>>> e : reports.entrySet())
+        {
+            List<List<Object>> report = e.getValue();
+            String r = printReport(report);
+            log.info(r);
+            if (null != repfile) {
+                FileUtils.write(new File(repfile + "-" + e.getKey() + ".csv"), r);
+            }
+        }
+
+        System.exit(0);
+    }
+
+    static String printReport(List<List<Object>> report) {
+        if (report.isEmpty()) return "";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Query,#Results");
+
+        List<Object> firstRow = report.get(0);
+        for (int i = 2; i < firstRow.size(); ++i) {
+            sb.append(",Sample #").append(i - 2);
+        }
+        sb.append("\n");
+        for (List<Object> row : report) {
+            for (int c = 0; c < row.size(); ++c) {
+                sb.append(row.get(c));
+                if (c != row.size() - 1) {
+                    sb.append(",");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
 }

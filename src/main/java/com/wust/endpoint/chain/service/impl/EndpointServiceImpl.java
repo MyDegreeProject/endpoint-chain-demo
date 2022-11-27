@@ -1,13 +1,10 @@
 package com.wust.endpoint.chain.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fluidops.fedx.Config;
-import com.fluidops.fedx.DefaultEndpointListProvider;
 import com.fluidops.fedx.FedXFactory;
 import com.fluidops.fedx.sail.FedXSailRepository;
 import com.fluidops.fedx.structures.QueryInfo;
@@ -17,15 +14,13 @@ import com.wust.endpoint.chain.persist.entity.EndpointUserEntity;
 import com.wust.endpoint.chain.persist.entity.FileEntity;
 import com.wust.endpoint.chain.persist.mapper.EndpointInfoMapper;
 import com.wust.endpoint.chain.persist.mapper.EndpointUserMapper;
+import com.wust.endpoint.chain.quetsal.summary.TBSSSummariesGenerator;
 import com.wust.endpoint.chain.response.EndpointResponse;
 import com.wust.endpoint.chain.service.EndpointService;
-import com.wust.endpoint.chain.quetsal.summary.TBSSSummariesGenerator;
 import com.wust.endpoint.chain.service.EndpointSummaryDataService;
-import com.wust.endpoint.chain.service.EndpointUserService;
 import com.wust.endpoint.chain.service.FileService;
 import com.wust.endpoint.chain.util.IPFSUtil;
 import com.wust.endpoint.chain.util.PathUtils;
-import com.wust.endpoint.chain.util.SnowflakeUtils;
 import com.wust.endpoint.chain.vo.req.DataFileReq;
 import com.wust.endpoint.chain.vo.req.DataSaveReq;
 import com.wust.endpoint.chain.vo.req.EndpointReq;
@@ -39,14 +34,13 @@ import org.eclipse.rdf4j.query.resultio.sparqlxml.SPARQLResultsXMLWriter;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -198,7 +192,7 @@ public class EndpointServiceImpl extends ServiceImpl<EndpointInfoMapper, Endpoin
         //读取配置文件
         Config config = new Config("/root/endpoint-chain-demo/costfed.props");
         //Config config = new Config("D:/baby/endpoint-chain-demo/costfed.props");
-        FedXSailRepository rep = FedXFactory.initializeFederation(config, new DefaultEndpointListProvider(endpointUrlList));
+        FedXSailRepository rep = FedXFactory.initializeSparqlFederation(config, endpointUrlList);
         try {
             OutputStream outputStream = response.getOutputStream();
             RepositoryConnection conn = rep.getConnection();

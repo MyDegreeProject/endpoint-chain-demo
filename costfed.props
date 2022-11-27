@@ -14,7 +14,7 @@ endpointProviderClass=com.wust.endpoint.chain.quetsal.configuration.EndpointList
 #quetzal.mode=INDEX_DOMINANT
 quetzal.mode=ASK_DOMINANT
 quetzal.inputCommonPredThreshold=0.33
-quetzal.fedSummaries=D:\\baby\\endpoint-chain-demo\\summaries\\endpoint-summaries.n3
+quetzal.fedSummaries=/summaries/all-localhost-summaries.n3
 
 statementGroupOptimizerClass=com.wust.endpoint.chain.quetsal.core.JoinOrderOptimizer
 #prefixDeclarations
